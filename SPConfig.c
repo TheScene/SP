@@ -17,8 +17,8 @@ int sysVarsFlag[numberOfArguements] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int currentVarIndex;
 
 typedef enum sp_kdtree_split_method {
-	RANDOM,
 	MAX_SPREAD,
+	RANDOM,
 	INCREMENTAL
 } SP_KDTREE_SPLIT_METHOD;
 
