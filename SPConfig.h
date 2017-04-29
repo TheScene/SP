@@ -52,7 +52,7 @@ SPConfig publicConfig;
  *
  *
  */
-SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg);
+SPConfig* spConfigCreate(const char* filename, SP_CONFIG_MSG* msg);
 
 /*
  * Returns true if spExtractionMode = true, false otherwise.
