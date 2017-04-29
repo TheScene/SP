@@ -853,16 +853,16 @@ SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config){
  */
 void spConfigDestroy(SPConfig config){
 	if (config){
-		if (config.spImagesDirectory)
-			free(config.spImagesDirectory);
-		if (config.spImagesPrefix)
-			free(config.spImagesPrefix);
-		if (config.spImagesSuffix)
-			free(config.spImagesSuffix);
-		if (config.spPCAFilename)
-			free(config.spPCAFilename);
-		if (config.spLoggerFilename)
-			free(config.spLoggerFilename);
+		if (config->spImagesDirectory)
+			free(config->spImagesDirectory);
+		if (config->spImagesPrefix)
+			free(config->spImagesPrefix);
+		if (config->spImagesSuffix)
+			free(config->spImagesSuffix);
+		if (config->spPCAFilename)
+			free(config->spPCAFilename);
+		if (config->spLoggerFilename)
+			free(config->spLoggerFilename);
 		free(config);
 	}
 	if (configFile)

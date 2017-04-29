@@ -1,5 +1,8 @@
 #include <stdbool.h>
 #include "main_aux.h"
+#include "SPConfig.h"
+#include "SPLogger.h"
+#include "unit_tests\\unit_test_util.h"
 
 void runTests(){
 	mainLoggerTest();

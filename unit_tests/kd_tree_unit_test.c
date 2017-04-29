@@ -5,7 +5,6 @@
 #include "../SPPoint.h"
 #include "unit_test_util.h" //SUPPORTING MACROS ASSERT_TRUE/ASSERT_FALSE etc..
 #include "../SPConfig.h"  //to delete
-#include "../CopyOfKDTree.h"
 
 int compareVal (const void * A, const void * B){
 	int* arrA = (int*)A;
@@ -103,26 +102,24 @@ bool IsIdenticalKDArrays(KD_ARRAY arr1, KD_ARRAY arr2){
 }
 
 KD_ARRAY BuildTestArr(){
-	KD_ARRAY* PArr = (KD_ARRAY*)malloc(sizeof(KD_ARRAY));
-	KD_ARRAY Arr = *PArr;
 
+	SPPoint** pointArr = (SPPoint**)malloc(sizeof(SPPoint*)*3);
+	KD_ARRAY kdArr = (KD_ARRAY)malloc(sizeof(KD_ARRAY));
+	SPPoint** pointArrTest = (SPPoint**)malloc(sizeof(SPPoint*)*3);
 
-	SPPoint** arr = (SPPoint**)malloc(sizeof(SPPoint*) * 3);
-+	double* data0= {3,0.1,178};
-+	double* data1= {2,1.5,2};
-+	double* data2= {1,1.5,1};
-	SPPoint* P1 = spPointCreate(data0, 3, 0);
-	arr[0] = P1;
-	SPPoint* P2 = spPointCreate(data1, 3, 0);
-	arr[0] = P2;
-	SPPoint* P3 = spPointCreate(data2, 3, 0);
-	arr[0] = P3;
+	double data1[] = {3.000,0.100,178.000};
+	double data2[] = {2.000,1.500,2.000};
+	double data3[] = {1.000,1.500,1.000};
 
-	Arr.arr = arr;
-	Arr.size=3;
-	Arr.mat = initMatrix(Arr);
+	pointArrTest[0] = spPointCreate(data1,3,1);
+	pointArrTest[1] = spPointCreate(data2,3,1);
+	pointArrTest[2] = spPointCreate(data3,3,1);
 
-	return Arr;
+	kdArr.arr = pointArrTest;
+	kdArr.size=3;
+	kdArr.mat = initMatrix(kdArr);
+
+	return kdArr;
 }
 
 KD_ARRAY BuildSmallTestArr(){
