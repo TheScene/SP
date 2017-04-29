@@ -1,0 +1,14 @@
+spImagesDirectory = 
+spImagesPrefix = 
+spImagesSuffix = 
+spNumOfImages = 
+spPCADimension =
+spPCAFilename =
+spNumOfFeatures = 
+spExtractionMode = 
+spNumOfSimilarImages = 
+spKDTreeSplitMethod = 
+spKNN = 
+spMinimalGUI = 
+spLoggerLevel = 
+spLoggerFilename = 

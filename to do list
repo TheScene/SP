@@ -1,0 +1,9 @@
+ti do list for the sp
+
+1. write the printing functions in the sp logger (all 4, error,warning, debug, info)
+2. to check if there is a memor allocation in the  logger, and add destroy accordingly
+3. write the spConfig.c program
+4. write a unit test for each c file
+5. extend the unittest for the logger, and the unit test util
+6. read and write the kd tree c and h file
+7. write tthe main
