@@ -244,6 +244,7 @@ SPBPQueue* InitKNearestNeighborSearch(KDTreeNode kdNode,SPPoint* testPoint){
 	//------------------------------------------------
 }
 
+
 int calcSpreadCoor(KD_ARRAY kdArr){
 	//input: array of points
 	//output: searches the max spreadand returns the corresponding coordinate
@@ -254,11 +255,11 @@ int calcSpreadCoor(KD_ARRAY kdArr){
 	int tmpSpread;
 	int tmpMaxMin;
 	int i = 0, j = 0;
-	for(i = 0; i < publicConfig->spPCADimension; i++){
-		min = kdArr->arr->data[i];
-		max = kdArr->arr->data[i];
-		for(j = 0; j < kdArr->size; j++){
-			tmpMaxMin = kdArr->arr->data[j];
+	min = kdArr.arr[0]->data[0];
+	max = kdArr.arr[0]->data[0];
+	for(i = 0; i < publicConfig.spPCADimension; i++){
+		for(j = 0; j < kdArr.size; j++){
+			tmpMaxMin = kdArr.arr[j]->data[i];
 			if( tmpMaxMin < min){
 				min = tmpMaxMin;
 			}else if(tmpMaxMin > max){
@@ -277,15 +278,15 @@ int calcSpreadCoor(KD_ARRAY kdArr){
 int determineCoor(KD_ARRAY kdArr){
 	srand(time(NULL));   // should only be called once
 	switch(publicConfig.spKDTreeSplitMethod){//do as get
-	case 0:
-		SplitCoor = calcSpreadCoor(kdArr);
-		break;
-	case 1:
-		SplitCoor = rand() % publicConfig->spPCADimension;//random number between 0 and numer of dimension
-		break;
-	case 2:
-		SplitCoor++;
-		break;
+		case MAX_SPREAD:
+			SplitCoor = calcSpreadCoor(kdArr);
+			break;
+		case RANDOM:
+			SplitCoor = rand() % publicConfig.spPCADimension;//random number between 0 and numer of dimension
+			break;
+		case INCREMENTAL:
+			SplitCoor++;
+			break;
 		//cases max spread random incremental
 	}
 	return SplitCoor;
@@ -296,9 +297,9 @@ double determineMedianValue(KD_ARRAY kdArr, int dim){
 	//output: the med
 	int i;
 	double median;
-	SPBPQueue* bpq = spBPQueueCreate((kdArr->size/2) + kdArr->size%2);
-	for(i = 0; i < kdArr->size; i++){
-		spBPQueueEnqueue(bpq,i,kdArr->arr[i]->data[dim]);
+	SPBPQueue* bpq = spBPQueueCreate(((kdArr.size)/2) + ((kdArr.size)%2));
+	for(i = 0; i < kdArr.size; i++){
+		spBPQueueEnqueue(bpq,i,kdArr.arr[i]->data[dim]);
 	}
 	median = spBPQueueMaxValue(bpq);
 	spBPQueueDestroy(bpq);
