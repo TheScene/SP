@@ -314,6 +314,137 @@ static bool InitArrayTest(){
 	return true;
 }
 
+static bool calcSpreadCoorTest(){
+	SPPoint** pointArrTest = (SPPoint**)malloc(sizeof(SPPoint*)*9);
+	double data1[] = {0.000,1.000,2.000};
+	double data2[] = {3.000,3.000,4.000};
+	double data3[] = {6.000,4.000,4.000};
+	double data4[] = {0.000,1.000,2.000};
+	double data5[] = {3.000,4.000,4.000};
+	double data6[] = {2.000,3.000,4.000};
+	double data7[] = {0.000,4.000,4.000};
+	double data8[] = {4.000,5.000,4.000};
+	double data9[] = {12.000,8.000,3.000};
+	pointArrTest[0] = spPointCreate(data1,3,1);
+	pointArrTest[1] = spPointCreate(data2,3,1);
+	pointArrTest[2] = spPointCreate(data3,3,1);
+	pointArrTest[3] = spPointCreate(data4,3,2);
+	pointArrTest[4] = spPointCreate(data5,3,2);
+	pointArrTest[5] = spPointCreate(data6,3,2);
+	pointArrTest[6] = spPointCreate(data7,3,3);
+	pointArrTest[7] = spPointCreate(data8,3,3);
+	pointArrTest[8] = spPointCreate(data9,3,3);
+
+	KD_ARRAY kdArr;
+	kdArr.arr = pointArrTest;
+	kdArr.size = 9;
+	int coor = calcSpreadCoor(kdArr);
+
+	ASSERT_TRUE(coor == 0);
+
+	spPointDestroy(pointArrTest[0]);
+	spPointDestroy(pointArrTest[1]);
+	spPointDestroy(pointArrTest[2]);
+	spPointDestroy(pointArrTest[3]);
+	spPointDestroy(pointArrTest[4]);
+	spPointDestroy(pointArrTest[5]);
+	spPointDestroy(pointArrTest[6]);
+	spPointDestroy(pointArrTest[7]);
+	spPointDestroy(pointArrTest[8]);
+
+	free(pointArrTest);
+
+	return true;
+}
+
+static bool determineCoorTest(){
+	KD_ARRAY kdArr;
+	kdArr.size = 9;
+
+	SPPoint** pointArrTest = (SPPoint**)malloc(sizeof(SPPoint*)*9);
+	double data1[] = {0.000,1.000,2.000};
+	double data2[] = {3.000,3.000,4.000};
+	double data3[] = {6.000,4.000,4.000};
+	double data4[] = {0.000,1.000,2.000};
+	double data5[] = {3.000,4.000,4.000};
+	double data6[] = {2.000,3.000,4.000};
+	double data7[] = {0.000,4.000,4.000};
+	double data8[] = {4.000,5.000,4.000};
+	double data9[] = {12.000,8.000,3.000};
+	pointArrTest[0] = spPointCreate(data1,3,1);
+	pointArrTest[1] = spPointCreate(data2,3,1);
+	pointArrTest[2] = spPointCreate(data3,3,1);
+	pointArrTest[3] = spPointCreate(data4,3,2);
+	pointArrTest[4] = spPointCreate(data5,3,2);
+	pointArrTest[5] = spPointCreate(data6,3,2);
+	pointArrTest[6] = spPointCreate(data7,3,3);
+	pointArrTest[7] = spPointCreate(data8,3,3);
+	pointArrTest[8] = spPointCreate(data9,3,3);
+
+	kdArr.arr = pointArrTest;
+
+	publicConfig.spKDTreeSplitMethod = MAX_SPREAD;
+
+	SplitCoor = determineCoor(kdArr);
+	ASSERT_TRUE(SplitCoor == 0);
+
+
+	spPointDestroy(pointArrTest[0]);
+	spPointDestroy(pointArrTest[1]);
+	spPointDestroy(pointArrTest[2]);
+	spPointDestroy(pointArrTest[3]);
+	spPointDestroy(pointArrTest[4]);
+	spPointDestroy(pointArrTest[5]);
+	spPointDestroy(pointArrTest[6]);
+	spPointDestroy(pointArrTest[7]);
+	spPointDestroy(pointArrTest[8]);
+
+	return true;
+}
+
+static bool determineMedianValueTest(){
+	KD_ARRAY kdArr;
+	kdArr.size = 9;
+	SPPoint** pointArrTest = (SPPoint**)malloc(sizeof(SPPoint*)*9);
+	double data1[] = {0.000,1.000,2.000};
+	double data2[] = {3.000,3.000,4.000};
+	double data3[] = {6.000,4.000,4.000};
+	double data4[] = {0.000,1.000,2.000};
+	double data5[] = {3.000,4.000,4.000};
+	double data6[] = {2.000,3.000,4.000};
+	double data7[] = {0.000,4.000,4.000};
+	double data8[] = {4.000,5.000,4.000};
+	double data9[] = {12.000,8.000,3.000};
+	pointArrTest[0] = spPointCreate(data1,3,1);
+	pointArrTest[1] = spPointCreate(data2,3,1);
+	pointArrTest[2] = spPointCreate(data3,3,1);
+	pointArrTest[3] = spPointCreate(data4,3,2);
+	pointArrTest[4] = spPointCreate(data5,3,2);
+	pointArrTest[5] = spPointCreate(data6,3,2);
+	pointArrTest[6] = spPointCreate(data7,3,3);
+	pointArrTest[7] = spPointCreate(data8,3,3);
+	pointArrTest[8] = spPointCreate(data9,3,3);
+
+	kdArr.arr = pointArrTest;
+
+	ASSERT_TRUE(determineMedianValue(kdArr,0) == 3.0);
+	ASSERT_TRUE(determineMedianValue(kdArr,1) == 4.0);
+	ASSERT_TRUE(determineMedianValue(kdArr,2) == 4.0);
+
+	spPointDestroy(pointArrTest[0]);
+	spPointDestroy(pointArrTest[1]);
+	spPointDestroy(pointArrTest[2]);
+	spPointDestroy(pointArrTest[3]);
+	spPointDestroy(pointArrTest[4]);
+	spPointDestroy(pointArrTest[5]);
+	spPointDestroy(pointArrTest[6]);
+	spPointDestroy(pointArrTest[7]);
+	spPointDestroy(pointArrTest[8]);
+
+	return true;
+}
+
+
 int mainTreeTest(){
 	RUN_TEST(concatTest);
 	RUN_TEST(convertIntToStrTest);
@@ -323,6 +454,9 @@ int mainTreeTest(){
 	RUN_TEST(InitArrayTest);
 	RUN_TEST(SplitTest);
 	RUN_TEST(InitTreeTest);
+	RUN_TEST(calcSpreadCoorTest);
+	RUN_TEST(determineCoorTest);
+	RUN_TEST(determineMedianValueTest);
 	return 0;
 }
 
