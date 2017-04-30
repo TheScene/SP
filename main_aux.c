@@ -57,6 +57,10 @@ int spExtract(){
 			featAddress = buildFeatAddress(i);
 			f = fopen(featAddress,"w+");
 			free(featAddress);
+			if(f == NULL){
+				//need to print here with guy's logger.
+				return 0;
+			}
 			//write everything to a file:
 			writeFeatsToFile(f,tmpFeats,i, *numOfFeatures); 
 			//--------------------------------------------------------------
