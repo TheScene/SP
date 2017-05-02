@@ -23,6 +23,13 @@ char* sysVarsControl[numberOfArguements] = {"spImagesDirectory","spImagesPrefix"
 int sysVarsFlag[numberOfArguements] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int currentVarIndex;
 
+typedef enum sp_kdtree_split_method {
+	MAX_SPREAD,
+	RANDOM,
+	INCREMENTAL
+} SP_KDTREE_SPLIT_METHOD;
+
+
 /** A type used for defining the configuration file**/
 typedef struct sp_config_t{
 	char* spImagesDirectory;
@@ -39,7 +46,7 @@ typedef struct sp_config_t{
 	bool spMinimalGUI;
 	SP_LOGGER_LEVEL spLoggerLevel;
 	char* spLoggerFilename;
-}SPConfig;
+}*SPConfig;
 
 SPConfig* publicConfig;
 
