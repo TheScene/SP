@@ -11,6 +11,13 @@
 #define MAX_LEN 1025 //1024 string including the terminating null character
 #define numberOfArguements 14 
 
+//-------------------------------------------------------------
+//TO DO - need to delete it later
+int k = 0;
+#define pr 	{printf("%d", k); k++; fflush(NULL);}
+#define cu 	printf("cur"); fflush(NULL);
+//-------------------------------------------------------------
+
 FILE* configFile;
 char* sysVarsControl[numberOfArguements] = {"spImagesDirectory","spImagesPrefix","spImagesSuffix","spNumOfImages","spPCADimension","spPCAFilename","spNumOfFeatures","spExtractionMode","spNumOfSimilarImages","spKDTreeSplitMethod","spKNN","spMinimalGUI","spLoggerLevel","spLoggerFilename" };
 int sysVarsFlag[numberOfArguements] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
