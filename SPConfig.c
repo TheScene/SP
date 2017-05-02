@@ -844,7 +844,7 @@ SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config){
  * Frees all memory resources associate with config.
  * If config == NULL nothig is done.
  */
-void spConfigDestroy(SPConfig config){
+void spConfigDestroy(SPConfig* config){
 	if (publicConfig){
 		if (publicConfig->spImagesDirectory)
 			free(publicConfig->spImagesDirectory);
@@ -862,3 +862,30 @@ void spConfigDestroy(SPConfig config){
 		fclose(configFile);
 }
 
+char* getSPLoggerFilename(){
+		return publicConfig->spLoggerFilename;
+}
+
+SP_LOGGER_LEVEL getSPLoggerLevel(){
+	return publicConfig->spLoggerLevel;
+}
+
+bool getSPExtractionMode(){
+	return publicConfig->spExtractionMode;
+}
+
+int getSPNumOfImages(){
+	return publicConfig->spNumOfImages;
+}
+
+int getSpKNN(){
+	return publicConfig->spKNN;
+}
+
+bool getSPMinimalGUI(){
+	return publicConfig->spMinimalGUI;
+}
+
+bool getSPNumOfSimilarImages(){
+	return publicConfig->spNumOfSimilarImages;
+}

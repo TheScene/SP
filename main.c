@@ -6,9 +6,10 @@
 #include <string.h>
 #include "main_aux.h"
 #include <stdbool.h>
+#include "SPPoint.h"
 
 SP_CONFIG_MSG* Cmsg;
-SP_LOGGER_LEVEL* Lmsg;
+SP_LOGGER_MSG* Lmsg;
 
 #define IsConfigErrExit 	if (!manageCMSG(&Cmsg)){printf("Exiting..."); return 1;}
 #define IsLoggerErrExit 	if (!manageCMSG(&Lmsg)){printf("Exiting..."); return 1;}
@@ -16,44 +17,49 @@ SP_LOGGER_LEVEL* Lmsg;
 
 int main(int argc, char** argv){
 
-	/* PART A: Tests */
-	runTests();
-	return 0;
+	// PART A: Tests
+	//runTests();
+	//return 0;
 
-	/* PART B - initiating */
+	// PART B - initiating
 	// B1: config
-	char* ConfigFileName =  getConfigFileName(argc, argv);
+	char* ConfigFileName =  argv[1];
 	SPConfig* config = spConfigCreate(ConfigFileName, Cmsg);
-	IsConfigErrExit
+
 
 	// B2: logger
-	Lmsg = spLoggerCreate(config->spLoggerFilename, config->spLoggerLevel);
-	IsLoggerErrExit
+	//int loggerLvl = (int)getSPLoggerLevel();
+	*Lmsg = spLoggerCreate(getSPLoggerFilename(),getSPLoggerLevel());
+
+	//IsLoggerErrExit
 
 	// B3: features //Vik to verify
 	int size;
-	if (config->spExtractionMode)
+	if (getSPExtractionMode()){
 		size = spExtract(config, Cmsg); //including verifying DONE and saving to directory
-	SPPoint** arr = (SPPoint**)malloc((SPPoint*)*size);
+	}
+	SPPoint** arr = (SPPoint**)malloc(sizeof(SPPoint*)*size);
 	
-	Init(arr,size);//inits the kdTree
-	IsConfigErrExit
-	initDataStructures(config, Cmsg);
-	IsConfigErrExit
-
-	/* PART C - Query */
-
-	While (true){
-//		comand = receiveComand(msg);
-//		manageMSG;
-//		comand? continue : return 0;
-//		resImages = findSimilarImages(query, msg);
-//		manageMSG;
-//		showImages(config.spMinimalGUI, resImages, msg);
-//		manageMSG;
+	//Init(arr,size);//inits the kdTree
+	//IsConfigErrExit
+	//initDataStructures(config, Cmsg); should be inside the init
+	//IsConfigErrExit
+	int* resImages;
+	int result;
+	// PART C - Query
+	while(true){//why is it error???
+		char* query = (char*)malloc(sizeof(char)*1024);
+		result = receiveQuery(query);
+		if(result == 1){
+			free(query);
+			break;
+		}
+		resImages = findSimilarImages(query);
+		showImages(getSPMinimalGUI(), resImages,query);
 	}
 
-	/* PART D - free */
-	freeAll(config, logger);
+	// PART D - free
+	freeAll(logger);
 	return 0;
 }
+

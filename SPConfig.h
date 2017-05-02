@@ -24,9 +24,16 @@ typedef enum sp_config_msg_t {
 	SP_CONFIG_SUCCESS
 } SP_CONFIG_MSG;
 
-typedef struct sp_config_t* SPConfig;
 
-SPConfig* publicConfig;
+typedef enum sp_kdtree_split_method {
+	MAX_SPREAD,
+	RANDOM,
+	INCREMENTAL
+} SP_KDTREE_SPLIT_METHOD;
+
+typedef struct sp_config_t SPConfig;
+
+extern SPConfig* publicConfig;;
 
 /**
  * Creates a new system configuration struct. The configuration struct
@@ -171,6 +178,35 @@ SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config);
  * Frees all memory resources associate with config. 
  * If config == NULL nothig is done.
  */
-void spConfigDestroy(SPConfig config);
+void spConfigDestroy(SPConfig* config);
 
+/*
+ * getter for the spLoggerFilename in the config
+ * */
+char* getSPLoggerFilename();
+
+/*
+ * getter for the spLoggerLevel
+ * */
+SP_LOGGER_LEVEL getSPLoggerLevel();
+
+/*
+ * getter for the spExtractionMode
+ * */
+bool getSPExtractionMode();
+
+/*
+ * getter for the NumOfImages
+ * */
+int getSPNumOfImages();
+
+/*
+ * getter for the spMinimalGUI
+ * */
+bool getSPMinimalGUI();
+
+/*
+ * getter for the spNumOfSimilarImages
+ * */
+bool getSPNumOfSimilarImages();
 #endif /* SPCONFIG_H_ */

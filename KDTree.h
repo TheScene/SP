@@ -92,5 +92,6 @@ KDTreeNode InitTree(KD_ARRAY arr);
 //O(d x nlog(n))
 void Init(SPPoint** arr, int size);
 
+char* buildAddress(int index);
 
 #endif /* KDTREE_H_ */
