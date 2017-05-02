@@ -24,13 +24,6 @@ typedef enum sp_config_msg_t {
 	SP_CONFIG_SUCCESS
 } SP_CONFIG_MSG;
 
-
-typedef enum sp_kdtree_split_method {
-	MAX_SPREAD,
-	RANDOM,
-	INCREMENTAL
-} SP_KDTREE_SPLIT_METHOD;
-
 typedef struct sp_config_t SPConfig;
 
 extern SPConfig* publicConfig;;
