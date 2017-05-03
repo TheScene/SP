@@ -27,7 +27,7 @@ int currentVarIndex;
 
 
 /** A type used for defining the configuration file**/
-typedef struct sp_config_t{
+/*typedef struct sp_config_t{
 	char* spImagesDirectory;
 	char* spImagesPrefix;
 	char* spImagesSuffix;
@@ -43,7 +43,7 @@ typedef struct sp_config_t{
 	SP_LOGGER_LEVEL spLoggerLevel;
 	char* spLoggerFilename;
 }*SPConfig;
-
+*/
 
 SPConfig* publicConfig;
 
