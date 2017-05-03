@@ -161,7 +161,7 @@ char* buildAddress(int index){
 	char* tmp0 = concat(publicConfig->spImagesDirectory,publicConfig->spImagesPrefix);
 	char* indexStr = convertIntToStr(index);
 	char* tmp1 = concat(tmp0,indexStr);
-	char* tmp2 = concat(tmp1,publicConfig.spImagesSuffix);
+	char* tmp2 = concat(tmp1,publicConfig->spImagesSuffix);
 	free(tmp0);
 	free(indexStr);
 	free(tmp1);
@@ -169,7 +169,7 @@ char* buildAddress(int index){
 }
 
 char* buildFeatAddress(int index){
-	char* tmp0 = concat(publicConfig.spImagesDirectory,publicConfig.spImagesPrefix);
+	char* tmp0 = concat(publicConfig->spImagesDirectory,publicConfig->spImagesPrefix);
 	char* indexStr = convertIntToStr(index);
 	char* tmp1 = concat(tmp0,indexStr);
 	char* tmp2 = concat(tmp1,".feats");
