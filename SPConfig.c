@@ -625,7 +625,7 @@ SPConfig* spConfigCreate(const char* filename, SP_CONFIG_MSG* msg){
 	//verify there's a file name
 	if (!filename){
 		*msg = SP_CONFIG_INVALID_ARGUMENT;
-		spConfigDestroy(*publicConfig);
+		spConfigDestroy(publicConfig);
 		return NULL;
 	}
 
@@ -633,14 +633,14 @@ SPConfig* spConfigCreate(const char* filename, SP_CONFIG_MSG* msg){
 	configFile = fopen(filename, "r");
 	if (!configFile){
 		*msg = SP_CONFIG_CANNOT_OPEN_FILE;
-		spConfigDestroy(*publicConfig);
+		spConfigDestroy(publicConfig);
 		return NULL;
 	}
 
 	//verify file is valid
 	*msg = checkConfigFileValid(filename);
 	if (*msg != SP_CONFIG_SUCCESS){
-		spConfigDestroy(*publicConfig);
+		spConfigDestroy(publicConfig);
 		return NULL;
 	}
 
