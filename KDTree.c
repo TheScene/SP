@@ -17,80 +17,118 @@
 
 int SplitCoor = 0;
 
-KDTreeNode createNode(int dim, double val, KDTreeNode* l, KDTreeNode* r, SPPoint* data){
-	KDTreeNode* nodeP = (KDTreeNode*) malloc(sizeof(KDTreeNode));
-	KDTreeNode node = *nodeP;
-	node.dim = dim;
-	node.val = val;
-	node.l = l;
-	node.r = r;
-	node.data = data;
+// debug tools
+int t1 = 0;
+#define fl 	fflush(NULL);
+#define pr 	printf("%d\n", t1); t1++; fl;
+#define cu 	printf("cur"); fl;
+#define cp for (int q = 0; q < NumOfPoints; ++q) printf("%d, %f, (index:%d)\n", q, RowToSort[q]->data[0], RowToSort[q]->index ); printf("\n------\n"); fl;
+#define mallocFail printf("alloc failed"); fl; return NULL;
+#define mallocFailVoid printf("alloc failed"); fl; return; //NULL;
+
+// CREATE & INIT & DESTROY //////////////////////////////////////////////////////////////////////////////
+
+KDTreeNode* createNode(int dim, double val, KDTreeNode* l, KDTreeNode* r, SPPoint* data){
+	KDTreeNode* node = (KDTreeNode*) malloc(sizeof(KDTreeNode));
+	node->dim = dim;
+	node->val = val;
+	node->l = l;
+	node->r = r;
+	node->data = data;
 	return node;
 }
 
-KDTreeNode createLeafNode(SPPoint* data){
-	KDTreeNode* nodeP = (KDTreeNode*) malloc(sizeof(KDTreeNode*));
-	KDTreeNode node = *nodeP;
-	node.dim = -1;
-	node.val = -1;
-	node.l = NULL;
-	node.r = NULL;
-	node.data = data;
+KDTreeNode* createLeafNode(SPPoint* data){
+	KDTreeNode* node = (KDTreeNode*) malloc(sizeof(KDTreeNode*));
+	node->dim = -1;
+	node->val = -1;
+	node->l = NULL;
+	node->r = NULL;
+	node->data = data;
 	return node;
 }
 
+// HELPER FUNC ////////////////////////////////////////////////////////////////////////////////////////////
 bool isLeaf(KDTreeNode node){
 	//input kd tree node
 	//checks if the node is a leaf
 	return node.l == NULL && node.r == NULL;
 }
 
+
 int compareVal (const void * A, const void * B){
-	int* arrA = (int*)A;
-	int* arrB = (int*)B;
-	int a = arrA[1];
-	int b = arrB[1];
+	SPPoint* PA = *(SPPoint * const *)A;
+	SPPoint* PB = *(SPPoint * const *)B;
+	double a = PA->data[0];
+	double b = PB->data[0];
 	if (a < b) return -1;
 	if (a == b) return 0;
-	 return 1; //if (a >  b)
+	return 1; //if (a >  b)
 }
+
+
 
 // A[i,j] has the order of the jth point comparing to the ith dimension of all points in P
 // for all i rows: initialize row{sort by dim i}};
 //sorting row O(nlog(n)) | all init O(d x nlog(n))
-int** initMatrix(KD_ARRAY P){
-	SP_CONFIG_MSG* msg;
-	int NumOfPoints = P.size;
-	int dim = spConfigGetPCADim(publicConfig,msg);
-	if(*msg != SP_CONFIG_SUCCESS)
-		return NULL;///////////elaborate
-	int** RowToSort = (int**)malloc(NumOfPoints*2); // will get the value of all the points' cur coor value, will be done for all coordinates
+int** initMatrix(KD_ARRAY* P){
 
-	int** A = (int**)malloc(dim * NumOfPoints);
-	if (!A){
-		free(RowToSort);
-		return NULL;//////////////elaborate
+	// get var
+	int NumOfPoints = P->size;
+	int dim = 3;
+
+	// malloc matrix A
+	int** A = (int**)malloc(sizeof(int*)*dim);
+	if(!A) {mallocFail}
+
+	for (int l = 0; l < dim; l++){
+		A[l] = (int*)malloc(sizeof(int)*NumOfPoints);
+		if (!A[l]) {mallocFail}
 	}
 
+	// malloc RowToSort
+	SPPoint** RowToSort = (SPPoint**)malloc(sizeof(SPPoint*)*NumOfPoints); // will get the value of all the points' cur coor value, will be done for all coordinates
+	if (!RowToSort) {mallocFail}
+
+	for (int k = 0; k < NumOfPoints; k++){
+		double data[1] = {0};
+		RowToSort[k] = spPointCreate(data,1,k);
+		if (!RowToSort[k]) {mallocFail}
+	}
+
+	// for every dim: init row to sort > sort > fill A
 	for (int i=0; i < dim; i++){
 		for (int j=0; j < NumOfPoints; j++){
-			RowToSort[j][0] = j;       // keep the index of the point, will connect to the point after sorting
-			RowToSort[j][1] = spPointGetAxisCoor(P.arr[j],i); //get the jth point's ith coor value
+			RowToSort[j]->index = j;
+			RowToSort[j]->data[0] = spPointGetAxisCoor(P->arr[j],i); //get the jth point's ith coor value
 		}
-		qsort(RowToSort, NumOfPoints, 2*sizeof(int), compareVal);//sort row with the original values
+
+		qsort(RowToSort, NumOfPoints, sizeof(SPPoint*), compareVal);//sort row with the original values
+
 		for (int k=0; k < NumOfPoints; k++){
-			A[i][RowToSort[k][0]] = k; // in the final matrix (A), in the current coordinate we initiate (line i),
+			A[i][RowToSort[k]->index] = k+1;
+			//(int)RowToSort[k]->data[0];
+			// in the final matrix (A), in the current coordinate we initiate (line i),
 			// we want to go point by point from the original point array (P),
 			// and place in the matrix in that specific point's cell (A[i][j]),
 			// the point's respective placement
 			// (ex. "0" if that point has the lowest value in that coor, among all other points)
-			// The placement of the jth point for the current coor in on RowToSort[k][1],
+			// The placement of the jth point for the current coor in on RowToSort[k]->index,
 			// where curRowVal[k]=j.
 		}
 	}
-	free(RowToSort);
+
+	//destroy RowToSort
+	for (int k = 0; k < NumOfPoints; k++){
+		spPointDestroy(RowToSort[k]);
+		free(RowToSort);
+	}
+
+	// return
 	return A;
 }
+
+
 
 char* concat(const char *s1, const char *s2)
 {
@@ -120,7 +158,7 @@ char* convertIntToStr(int number){
 }
 
 char* buildAddress(int index){
-	char* tmp0 = concat(publicConfig.spImagesDirectory,publicConfig.spImagesPrefix);
+	char* tmp0 = concat(publicConfig->spImagesDirectory,publicConfig->spImagesPrefix);
 	char* indexStr = convertIntToStr(index);
 	char* tmp1 = concat(tmp0,indexStr);
 	char* tmp2 = concat(tmp1,publicConfig.spImagesSuffix);
@@ -170,8 +208,8 @@ KD_ARRAY InitArray(SPPoint** pointArr, int size){
 // input: gets an empty array pointer, mallocs it with the size 'size'
 //and starts adding points
 	KD_ARRAY kdArr;
-	int numberOfImages = publicConfig.spNumOfImages;
-	int dim = publicConfig.spPCADimension;
+	int numberOfImages = publicConfig->spNumOfImages;
+	int dim = publicConfig->spPCADimension;
 	int i = 0;
 	int j = 0;
 	int k = 0;
@@ -208,7 +246,7 @@ KD_ARRAY InitArray(SPPoint** pointArr, int size){
 }
 
 
-void KNearestNeighborSearch(KDTreeNode curr, SPBPQueue* bpq, SPPoint* testPoint){
+void KNearestNeighborSearch(KDTreeNode* curr, SPBPQueue* bpq, SPPoint* testPoint){
 	// input: kd tree with all the features, a test point, and priority queue to work with
 	// output: update the priority queue, so that at the end it has the spknn nearest features
 	if(curr == NULL){
@@ -314,112 +352,189 @@ double determineMedianValue(KD_ARRAY kdArr, int dim){
 //	return res;
 //}
 
-void SplitMatrix(int** A, int* X, int NumOfPoints, KD_ARRAY* SplittedArrays){
+// SPLIT ///////////////////////////////////////////////////////////////////////////////////
+void SplitMatrix(int** A, int* X, int NumOfPoints, KD_ARRAY** SplittedArrays){
 
 	//Part 1: create the maps
-	int* map1 = (int*)malloc(NumOfPoints);
-	int* map2 = (int*)malloc(NumOfPoints);
-	int l = 0; // iterates on P1, will represent it's ordered position
-	int r = 0; // iterates on P2, will represent it's ordered position
+	int* map1 = (int*)malloc(sizeof(int) * NumOfPoints);
+	if (!map1) {mallocFailVoid}
+	int* map2 = (int*)malloc(sizeof(int) * NumOfPoints);
+	if (!map1) {mallocFailVoid}
 
-	for (int i = 0; i < (NumOfPoints); i++) {
-		if (X[i] == 0){         // the ith point is on the lth ordered position among P1
-			map1[i] = l;
-			map2[i] = -1;
-			l++;
+	int l3 = 0; // iterates on P1, will represent it's ordered position
+	int r3 = 0; // iterates on P2, will represent it's ordered position
+
+	for (int i3 = 0; i3 < (NumOfPoints); i3++) {
+		if (X[i3] == 0){         // the ith point is on the lth ordered position among P1
+			map1[i3] = l3;
+			map2[i3] = -1;
+			l3++;
 		}
 		else {					// the ith point is on the rth ordered position among P2
-			map1[i] = -1;
-			map2[i] = r;
-			r++;
+			map1[i3] = -1;
+			map2[i3] = r3;
+			r3++;
 		}
 	}
 
+
 	//Part 2: populate the matrices
-	SP_CONFIG_MSG* msg;
-	int dim = spConfigGetPCADim(publicConfig,msg);
-	if(*msg != SP_CONFIG_SUCCESS)
-		return;
+	//	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
+	int dim = 3; //spConfigGetPCADim(*publicConfig,&msg);
+	//	if(msg != SP_CONFIG_SUCCESS)
+	//		return;
 	///////////elaborate
 
-	int** A1 = (int**)malloc(dim * (NumOfPoints/2 + NumOfPoints%2));
-	int** A2 = (int**)malloc(dim * NumOfPoints/2);
+	int** A1 = (int**)malloc(sizeof(int*) * dim);
+	if (!A1) {mallocFailVoid}
+	for (int l1 = 0; l1 <dim; l1++){
+		A1[l1] = (int*)malloc(sizeof(int)*NumOfPoints/2 + NumOfPoints%2);
+		if (!A1[l1]) {mallocFailVoid}
+	}
 
-	l=0;
-	r=0;
-	for (int m=0; m < dim; m++){
-		for (int n=0; n < NumOfPoints; n++){
-			if(map1[n] != -1){            //suppose to be on A1
-				A1[m][l] = A[m][n];
-				l++;
-			}
-			else{                         //suppose to be on A2
-				A2[m][r] = A[m][n];
-				r++;
-			}
+	int** A2 = (int**)malloc(sizeof(int*) * dim);
+	if (!A2) {mallocFailVoid}
+	for (int l2 = 0; l2 <dim; l2++){
+		A2[l2] = (int*)malloc(sizeof(int)*(NumOfPoints/2));
+		if (!A2[l2]) {mallocFailVoid}
+	}
+
+	l3=0;
+	r3=0;
+
+	for (int n=0; n < NumOfPoints; n++){
+		if(map1[n] != -1){   //suppose to be on A1
+
+			for (int m=0; m < dim; m++)
+				A1[m][l3] = A[m][n];
+			l3++;
 		}
-
+		else{      //suppose to be on A2
+			for (int m=0; m < dim; m++)
+				A2[m][r3] = A[m][n];
+			r3++;
+		}
 	}
 	free(map1);
 	free(map2);
-	SplittedArrays[0].mat = A1;
-	SplittedArrays[1].mat = A2;
+	SplittedArrays[0]->mat = A1;
+	SplittedArrays[1]->mat = A2;
 }
 
 // X[i] has 0/1 value of the ith point: 0 if smaller than the median point of the splitting coor, 1 otherwise
 //	signRowForSplitting{sign 0/1 = r/l for each cell in row coor};// we can do it since we dont corrupt to original arr)
 int* initSortingArr(int** A, int coor, int NumOfPoints){
-	int* X = (int*)malloc(NumOfPoints);
+
+	// malloc
+	int* X = (int*)malloc(sizeof(int) * NumOfPoints);
+	if (!X) {mallocFail}
+
+	// set 0/1 values
 	for (int j=0; j<NumOfPoints; j++) {
 		if(A[coor][j] > (NumOfPoints/2+NumOfPoints%2)) // The smaller half of the images (rounded up) will be in the Left array, the bigger ones on the Right
 			X[j]=1;
 		else
 			X[j]=0;
 	}
+
+	//return
 	return X;
 }
 
-KD_ARRAY* BuildSplitedArrays (KD_ARRAY P, int* X, int NumOfPoints){
 
-	KD_ARRAY* SplittedArr = (KD_ARRAY*)malloc(sizeof(KD_ARRAY)*2);
 
+// X[i] has 0/1 value of the ith point: 0 if smaller than the median point of the splitting coor, 1 otherwise
+//	signRowForSplitting{sign 0/1 = r/l for each cell in row coor};// we can do it since we dont corrupt to original arr)
+int* initSortingArr(int** A, int coor, int NumOfPoints){
+
+	// malloc
+	int* X = (int*)malloc(sizeof(int) * NumOfPoints);
+	if (!X) {mallocFail}
+
+	// set 0/1 values
+	for (int j=0; j<NumOfPoints; j++) {
+		if(A[coor][j] > (NumOfPoints/2+NumOfPoints%2)) // The smaller half of the images (rounded up) will be in the Left array, the bigger ones on the Right
+			X[j]=1;
+		else
+			X[j]=0;
+	}
+
+	//return
+	return X;
+}
+
+KD_ARRAY** BuildSplitedArrays(KD_ARRAY* P, int* X, int NumOfPoints){
+
+	// malloc res array
+	KD_ARRAY** SplittedArr = (KD_ARRAY**)malloc(sizeof(KD_ARRAY*)*2);
+	if (!SplittedArr) {mallocFail}
+
+
+
+	// malloc array 1
 	KD_ARRAY* P1 = (KD_ARRAY*)malloc(sizeof(KD_ARRAY));
+	if (!P1) {mallocFail}
+
 	SPPoint** p1 = (SPPoint**)malloc(sizeof(SPPoint*) * (NumOfPoints/2 + NumOfPoints%2));
+	if (!p1) {mallocFail}
+
 	P1->arr = p1;
+	P1->size = (NumOfPoints/2 + NumOfPoints%2);
+	P1->mat = NULL;
 
+	// malloc array 2
 	KD_ARRAY* P2 = (KD_ARRAY*)malloc(sizeof(KD_ARRAY));
-	SPPoint** p2 = (SPPoint**)malloc(sizeof(SPPoint*) * (NumOfPoints/2));
-	P2->arr = p2;
+	if (!P2) {mallocFail}
 
+	SPPoint** p2 = (SPPoint**)malloc(sizeof(SPPoint*) * (NumOfPoints/2));
+	if (!p2) {mallocFail}
+
+	P2->arr = p2;
+	P2->size = NumOfPoints/2;
+	P2->mat = NULL;
+
+	// fill arrays from the original array
 	int l = 0; // iterate on the left array P1
 	int r = 0; // iterate on the right array P2
 	for (int j = 0; j < (NumOfPoints); j++) {
-		if (X[j] == 0){         // the jth point's value at of coor <= median - will go on the left branch
-			P1->arr[l] = spPointCopy(P.arr[j]);
+		if (X[j] == 0){        // the jth point's value at of coor <= median - will go on the left branch
+			P1->arr[l] = spPointCopy(P->arr[j]);
+			if (!P1->arr[l]) {mallocFail}
 			l++;
+			//			printPointsArr(P1->arr, P1->size, 3);
+			//			printPointsArr(P2->arr, P2->size, 3);
 		}
 		else {					// the jth point's value at of coor > median - will go on the left branch
-			P2->arr[r] = spPointCopy(P.arr[j]);
+			P2->arr[r] = spPointCopy(P->arr[j]);
+			if (!P2->arr[r]) {mallocFail}
 			r++;
+			//			printPointsArr(P1->arr, P1->size, 3);
+			//			printPointsArr(P2->arr, P2->size, 3);
 		}
 	}
-	SplittedArr[0]=*P1;
-	SplittedArr[1]=*P2;
+
+
+	// return
+	SplittedArr[0]=P1;
+	SplittedArr[1]=P2;
 	return SplittedArr;
 }
 
-void destroyArr(KD_ARRAY* Arr){
-	if(!Arr)
+
+void destroyArr(KD_ARRAY* arr){
+	if(!arr)
 		return;
-	KD_ARRAY arr=*Arr;
-	if(*arr.arr){
-		for (int i = 0; i < arr.size; i++)
-			spPointDestroy(arr.arr[0]);
-		free(arr.arr);
+	if(arr->arr){
+		for (int i = 0; i < arr->size; i++)
+			spPointDestroy(arr->arr[i]);
+		free(arr->arr);
 	}
-	if(arr.mat)
-		free(arr.mat);
-	free(Arr);
+	int dim = 3;
+	if(arr->mat)
+		for (int l = 0; l < dim; l++)
+			free (arr->mat[l]);
+	free(arr->mat);
+	free(arr);
 }
 
 //coor - by which coordinate to split
@@ -427,13 +542,14 @@ void destroyArr(KD_ARRAY* Arr){
 //O(d x n)
 // d = spPCADimension
 // n = total no of features of all img in the directory
-KD_ARRAY* Split(KD_ARRAY kdArr, int coor){
-	int* X = initSortingArr(kdArr.mat, coor, kdArr.size);     // X[i] has 0/1 value of the ith point: 0 if smaller than the median point of the splitting coor, 1 otherwise
-	KD_ARRAY* splittedArr = BuildSplitedArrays(kdArr, X, kdArr.size);  // Splits the original Array into left and right
-	SplitMatrix(kdArr.mat, X, kdArr.size, splittedArr);    //Assign the splitted arrays their respective matrix for the next run
+KD_ARRAY** Split(KD_ARRAY* kdArr, int coor){
+	int* X = initSortingArr(kdArr->mat, coor, kdArr->size); // X[i] has 0/1 value of the ith point: 0 if smaller than the median point of the splitting coor, 1 otherwise
+	KD_ARRAY** splittedArr = BuildSplitedArrays(kdArr, X, kdArr->size); // Splits the original Array into left and right
+	SplitMatrix(kdArr->mat, X, kdArr->size, splittedArr); //Assign the splitted arrays their respective matrix for the next run
 	free(X);
 	return splittedArr;
 }
+
 
 void destroyTree(KDTreeNode* node){
 	spPointDestroy(node->data);
@@ -443,28 +559,38 @@ void destroyTree(KDTreeNode* node){
 		destroyTree(node->r);
 }
 
-KDTreeNode InitTree(KD_ARRAY arr){
+// TREE ///////////////////////////////////////////////////////////////////////////////////
+KDTreeNode* InitTree(KD_ARRAY* arr){
 
 	//Recursion stopping condition
-	if (arr.size == 1)
-		return createLeafNode(arr.arr[0]);
+	if (arr->size == 1){
+		KDTreeNode* res = createLeafNode(arr->arr[0]);
+		if(!res) {mallocFail}
+		return res;
+	}
 
 	//Recursion step
-	int dim = determineCoor(arr);
-	double val = determineMedianValue(arr, dim);
-	KD_ARRAY* splittedArr = Split(arr, dim);
-	KDTreeNode l = InitTree(splittedArr[0]);
-	KDTreeNode r = InitTree(splittedArr[1]);
-	destroyArr(&splittedArr[0]);
-	destroyArr(&splittedArr[1]);
+	int dim = 0;  // use func
+	double val = 0; // use func
+	KD_ARRAY** splittedArr = Split(arr, dim);
+	KDTreeNode* l = InitTree(splittedArr[0]);
+	KDTreeNode* r = InitTree(splittedArr[1]);
+	destroyArr(splittedArr[0]);
+	destroyArr(splittedArr[1]);
 	SPPoint* data = NULL;
-	return createNode(dim, val, &l, &r, data);
+	KDTreeNode* res = createNode(dim, val, l, r, data);
+	if (!res) {mallocFail}
+	fl
+	return res;
+	/////////////////////
 }
 
 //init of KDarray
 //O(d x nlog(n))
-void Init(SPPoint** arr, int size){
+KDTreeNode* Init(SPPoint** arr, int size){
 	KD_ARRAY* kdArr = InitArray(arr,size);
-	InitTree(*kdArr);
+	KDTreeNode* res = InitTree(kdArr);
+	if(!res) {mallocFail}
+	return res;//malloc fail?
 }
 

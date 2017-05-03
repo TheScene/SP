@@ -39,8 +39,7 @@ int main(int argc, char** argv){
 		size = spExtract(config, Cmsg); //including verifying DONE and saving to directory
 	}
 	SPPoint** arr = (SPPoint**)malloc(sizeof(SPPoint*)*size);
-	
-	//Init(arr,size);//inits the kdTree
+	KDTreeNode* root = Init(arr,size);//inits the kdTree
 	//IsConfigErrExit
 	//initDataStructures(config, Cmsg); should be inside the init
 	//IsConfigErrExit
@@ -54,7 +53,7 @@ int main(int argc, char** argv){
 			free(query);
 			break;
 		}
-		resImages = findSimilarImages(query);
+		resImages = findSimilarImages(root, query);
 		showImages(getSPMinimalGUI(), resImages,query);
 	}
 

@@ -111,7 +111,7 @@ int receiveQuery(char* buffer){
 	return 0;
 }
 
-int* findSimilarImages(KDTreeNode curr,char* query){
+int* findSimilarImages(KDTreeNode* curr,char* query){
 	int* numOfFeatures;
 	SPPoint** features = getImageFeatures(query,0,numOfFeatures);
 	SPBPQueue* bpq = spBPQueueCreate(getSpKNN());

@@ -11,6 +11,7 @@
 #include "unit_tests\\unit_test_util.h"
 #include "SPConfig.h"
 #include "SPLogger.h"
+#include "KDTree.h"
 
 void runTests();
 
@@ -67,7 +68,7 @@ int receiveQuery(char* buffer);
  * each cell in the array i has the value of how close the image i
  * to the query image.
  * */
-int* findSimilarImages(KDTreeNode curr,char* query);
+int* findSimilarImages(KDTreeNode* curr,char* query);
 
 
 /*

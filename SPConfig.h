@@ -8,6 +8,13 @@
 /**
  * A data-structure which is used for configuring the system.
  */
+typedef enum sp_kdtree_split_method {
+	MAX_SPREAD,
+	RANDOM,
+	INCREMENTAL
+} SP_KDTREE_SPLIT_METHOD;
+
+
 
 typedef enum sp_config_msg_t {
 	SP_CONFIG_MISSING_DIR,
@@ -24,9 +31,25 @@ typedef enum sp_config_msg_t {
 	SP_CONFIG_SUCCESS
 } SP_CONFIG_MSG;
 
-typedef struct sp_config_t SPConfig;
+typedef struct sp_config_t{
+	char* spImagesDirectory;
+	char* spImagesPrefix;
+	char* spImagesSuffix;
+	int spNumOfImages;
+	int spPCADimension;
+	char* spPCAFilename;
+	int spNumOfFeatures;
+	bool spExtractionMode;
+	int spNumOfSimilarImages;
+	SP_KDTREE_SPLIT_METHOD spKDTreeSplitMethod;
+	int spKNN;
+	bool spMinimalGUI;
+	SP_LOGGER_LEVEL spLoggerLevel;
+	char* spLoggerFilename;
+}SPConfig;
 
 extern SPConfig* publicConfig;;
+
 
 /**
  * Creates a new system configuration struct. The configuration struct

@@ -23,6 +23,7 @@ typedef struct SPDKArray{
 	int** mat;
 }KD_ARRAY;
 
+
 typedef struct sp_kd_tree_node KDTreeNode;
 
 struct sp_kd_tree_node{
@@ -33,9 +34,11 @@ struct sp_kd_tree_node{
 	SPPoint* data;
 };
 
-KDTreeNode createNode(int dim, double val, KDTreeNode* l, KDTreeNode* r, SPPoint* data);
+extern int SplitCoor;
 
-KDTreeNode createLeafNode(SPPoint* data);
+KDTreeNode* createNode(int dim, double val, KDTreeNode* l, KDTreeNode* r, SPPoint* data);
+
+KDTreeNode* createLeafNode(SPPoint* data);
 
 bool isLeaf(KDTreeNode node);
 
@@ -44,7 +47,7 @@ int compareVal (const void * A, const void * B);
 // A[i,j] has the order of the jth point comparing to the ith dimension of all points in P
 // for all i rows: initialize row{sort by dim i}};
 //sorting row O(nlog(n)) | all init O(d x nlog(n))
-int** initMatrix(KD_ARRAY P);
+int** initMatrix(KD_ARRAY* P);
 
 char* concat(const char *s1, const char *s2);
 
@@ -58,7 +61,7 @@ void writeFeatsToFile(FILE* f, SPPoint** feats,int index, int numOfFeats);
 
 KD_ARRAY* InitArray(SPPoint** arr, int size);
 
-void KNearestNeighborSearch(KDTreeNode curr, SPBPQueue* bpq, SPPoint* testPoint);
+void KNearestNeighborSearch(KDTreeNode* curr, SPBPQueue* bpq, SPPoint* testPoint);
 
 //this code implements the psuedo code suggested in the work instruction
 SPBPQueue* InitKNearestNeighborSearch(KDTreeNode kdNode,SPPoint* testPoint);
@@ -75,7 +78,7 @@ void SplitMatrix(int** A, int* X, int NumOfPoints, KD_ARRAY* SplittedArrays);
 //	signRowForSplitting{sign 0/1 = r/l for each cell in row coor};// we can do it since we dont corrupt to original arr)
 int* initSortingArr(int** A, int coor, int NumOfPoints);
 
-KD_ARRAY* BuildSplitedArrays (KD_ARRAY P, int* X, int NumOfPoints);
+KD_ARRAY** BuildSplitedArrays (KD_ARRAY* P, int* X, int NumOfPoints);
 
 void destroyArr(KD_ARRAY* Arr);
 
@@ -86,11 +89,11 @@ void destroyArr(KD_ARRAY* Arr);
 // n = total no of features of all img in the directory
 KD_ARRAY* Split(KD_ARRAY kdArr, int coor);
 
-KDTreeNode InitTree(KD_ARRAY arr);
+KDTreeNode InitTree(KD_ARRAY* arr);
 
 //init of KDarray
 //O(d x nlog(n))
-void Init(SPPoint** arr, int size);
+KDTreeNode* Init(SPPoint** arr, int size);
 
 char* buildAddress(int index);
 
