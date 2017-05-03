@@ -89,7 +89,7 @@ void destroyArr(KD_ARRAY* Arr);
 // n = total no of features of all img in the directory
 KD_ARRAY* Split(KD_ARRAY kdArr, int coor);
 
-KDTreeNode InitTree(KD_ARRAY* arr);
+KDTreeNode* InitTree(KD_ARRAY* arr);
 
 //init of KDarray
 //O(d x nlog(n))
